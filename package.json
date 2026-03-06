@@ -1,0 +1,39 @@
+{
+  "name": "nodepanelg",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon --exec node --loader ts-node/esm src/index.ts",
+    "dev:client": "cd client && npm run dev",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "cd client && npm run build",
+    "build:server": "tsc",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mnavarrosqa/nodepanelg.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mnavarrosqa/nodepanelg/issues"
+  },
+  "homepage": "https://github.com/mnavarrosqa/nodepanelg#readme",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.3",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
