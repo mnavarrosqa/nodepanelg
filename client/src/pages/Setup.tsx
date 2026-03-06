@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { apiUrl } from '../api';
 
-export function Login() {
+export function Setup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,21 +19,32 @@ export function Login() {
       </div>
     );
   }
-
-  if (setupNeeded) return <Navigate to="/setup" replace />;
+  if (!setupNeeded) return <Navigate to="/login" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(apiUrl('/api/auth/login'), {
+      const res = await fetch(apiUrl('/api/auth/setup'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Sign in failed');
+      const text = await res.text();
+      const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
+      if (!res.ok) {
+        if (res.status === 400 && data.error === 'Setup already completed') {
+          navigate('/login');
+          return;
+        }
+        if (res.status === 404) {
+          setError('API not reachable. Run "npm run dev" from the project root (starts both server and client).');
+          setLoading(false);
+          return;
+        }
+        throw new Error(data.error || 'Setup failed');
+      }
       login(data.user, data.token);
       navigate('/');
     } catch (err: any) {
@@ -50,8 +61,8 @@ export function Login() {
           <div className="bg-white p-3 rounded-full mb-4 shadow">
             <Cpu className="text-primary" size={40} />
           </div>
-          <h1 className="text-2xl font-bold">Sign in</h1>
-          <p className="text-muted text-sm mt-2">Enter your credentials to access the dashboard.</p>
+          <h1 className="text-2xl font-bold">Create Admin Account</h1>
+          <p className="text-muted text-sm mt-2">First-time setup. Choose an email and password for the administrator.</p>
         </div>
 
         {error && (
@@ -84,7 +95,7 @@ export function Login() {
             />
           </div>
           <button type="submit" className="btn-primary mt-4 py-2" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Creating...' : 'Create Admin'}
           </button>
         </form>
       </div>

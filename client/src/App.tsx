@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import { Login } from './pages/Login';
+import { Setup } from './pages/Setup';
 import { Users } from './pages/Users';
 import { Applications } from './pages/Applications';
 import { Settings } from './pages/Settings';
@@ -10,8 +11,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading, setupNeeded } = useAuth();
 
   if (loading) return <div>Loading...</div>;
-  if (setupNeeded) return <Navigate to="/login" />;
-  if (!user) return <Navigate to="/login" />;
+  if (setupNeeded) return <Navigate to="/setup" replace />;
+  if (!user) return <Navigate to="/login" replace />;
 
   return <>{children}</>;
 }
@@ -19,6 +20,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/setup" element={<Setup />} />
       <Route path="/login" element={<Login />} />
       <Route 
         path="/" 

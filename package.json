@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "nodemon --exec node --loader ts-node/esm src/index.ts",
+    "dev:server": "cross-env PORT=3002 tsx watch src/index.ts",
     "dev:client": "cd client && npm run dev",
     "build": "npm run build:client && npm run build:server",
     "build:client": "cd client && npm run build",
@@ -39,6 +39,8 @@
     "@types/node": "^25.3.3",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.14",
+    "cross-env": "^7.0.2",
+    "tsx": "^4.19.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiUrl } from '../api';
 
 interface User {
   id: number;
@@ -36,11 +37,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkSetupStatus = async () => {
     try {
-      const res = await fetch('/api/auth/status');
-      const data = await res.json();
-      setSetupNeeded(data.setupNeeded);
+      const res = await fetch(apiUrl('/api/auth/status'));
+      const text = await res.text();
+      let data: { setupNeeded?: boolean };
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setSetupNeeded(true);
+        return;
+      }
+      if (res.ok && typeof data.setupNeeded === 'boolean') {
+        setSetupNeeded(data.setupNeeded);
+      } else {
+        setSetupNeeded(true);
+      }
     } catch (error) {
       console.error('Failed to check setup status', error);
+      setSetupNeeded(true);
     }
   };
 

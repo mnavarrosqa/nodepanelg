@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { UserPlus, Trash2, Shield, User as UserIcon, X } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { useAuth } from '../components/AuthContext';
+import { apiUrl } from '../api';
 
 interface UserData {
   id: number;
@@ -24,7 +25,7 @@ export function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('/api/users', {
+      const res = await fetch(apiUrl('/api/users'), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch users');
@@ -45,7 +46,7 @@ export function Users() {
     e.preventDefault();
     setAddLoading(true);
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ export function Users() {
     if (!confirm('Are you sure you want to delete this user?')) return;
 
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(apiUrl(`/api/users/${id}`), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
