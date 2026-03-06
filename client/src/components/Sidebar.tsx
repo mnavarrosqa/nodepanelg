@@ -1,9 +1,17 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Server, Users, Settings, LogOut, Cpu } from 'lucide-react';
+import { useAuth } from './AuthContext';
 import './Sidebar.css';
 
 export function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -37,7 +45,13 @@ export function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="sidebar-link logout-btn">
+        {user && (
+          <div className="sidebar-user-info mb-4">
+            <p className="text-sm font-bold truncate">{user.email}</p>
+            <p className="text-xs text-muted uppercase tracking-wider">{user.role}</p>
+          </div>
+        )}
+        <button onClick={handleLogout} className="sidebar-link logout-btn">
           <LogOut size={20} />
           <span>Logout</span>
         </button>

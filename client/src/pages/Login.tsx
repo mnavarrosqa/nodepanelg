@@ -1,16 +1,44 @@
 import { useState } from 'react';
 import { Cpu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/AuthContext';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login, setupNeeded } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just redirect to dashboard
-    navigate('/');
+    setError('');
+    setLoading(true);
+
+    const endpoint = setupNeeded ? '/api/auth/setup' : '/api/auth/login';
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      login(data.user, data.token);
+      navigate('/');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -20,9 +48,21 @@ export function Login() {
           <div className="bg-white p-3 rounded-full mb-4 shadow">
             <Cpu className="text-primary" size={40} />
           </div>
-          <h1 className="text-2xl font-bold">Sign in to NodePanelG</h1>
-          <p className="text-muted text-sm mt-2">Enter your credentials to access your dashboard</p>
+          <h1 className="text-2xl font-bold">
+            {setupNeeded ? 'Create Admin Account' : 'Sign in to NodePanelG'}
+          </h1>
+          <p className="text-muted text-sm mt-2">
+            {setupNeeded 
+              ? 'This is your first time. Please set up the administrator account.' 
+              : 'Enter your credentials to access your dashboard'}
+          </p>
         </div>
+
+        {error && (
+          <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-sm font-medium">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -49,8 +89,12 @@ export function Login() {
             />
           </div>
 
-          <button type="submit" className="btn-primary mt-4 py-2">
-            Sign In
+          <button 
+            type="submit" 
+            className="btn-primary mt-4 py-2"
+            disabled={loading}
+          >
+            {loading ? 'Processing...' : (setupNeeded ? 'Complete Setup' : 'Sign In')}
           </button>
         </form>
       </div>
