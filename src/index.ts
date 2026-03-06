@@ -133,7 +133,7 @@ app.delete('/api/users/:id', requireAdmin, (req: Request, res: Response) => {
 });
 
 // --- Catch-all ---
-app.get('*', (req: Request, res: Response) => {
+app.use((req: Request, res: Response) => {
   res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
